@@ -19,6 +19,7 @@ def read_config(config_path="config.txt"):
     subdomain = ""
     email = ""
     password = ""
+    token = ""
 
     with open(config_path, 'r') as f:
         for line in f.readlines():
@@ -31,6 +32,8 @@ def read_config(config_path="config.txt"):
                 email = line.split(":")[1]       
             elif line.startswith("password:"):
                 password = line.split(":")[1]
+            elif line.startswith("token:"):
+                token = line.split(":")[1]
 
     # error checking
     if subdomain == "":
@@ -39,13 +42,15 @@ def read_config(config_path="config.txt"):
     if email == "":
         raise Exception(f"Error: No subdomain found in {config_path}. Please specify by adding the line:\nemail:your_email")
 
-    if password == "":
-        raise Exception(f"Error: No password found in {config_path}. Please specify by adding the line:\npassword:your_password")
+    if password == "" and token == "":
+        raise Exception(f"Error: No password or token found in {config_path}. Please specify by adding the line:\npassword:your_password\nor\ntoken:your_api_token")
 
-    # make an auth obhect
-    auth = HTTPBasicAuth(email, password)
-    
-    return auth, subdomain
+
+    # make an auth object based on api_key or password. Pereference given to api token
+    if token != "":
+        return HTTPBasicAuth(f"{email}/token", token), subdomain
+    else:
+        return HTTPBasicAuth(email, password), subdomain
 
 
 # returns a list of dictionaries of all the account's tickets and the number of pages of tickets
