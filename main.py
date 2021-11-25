@@ -5,10 +5,8 @@
 # o-------------------------------------------o
 
 # used for handling get requests and auth
-from socket import socket
 import requests
 from requests.auth import AuthBase, HTTPBasicAuth
-from urllib3.exceptions import NewConnectionError
 
 # global variables
 page_size = 25
