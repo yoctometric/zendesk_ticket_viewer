@@ -9,9 +9,9 @@
 5. set up config.txt with your credentials
     * add your subdomain and email
     * either add your password or an api token. If both are added the program will just use the token
-    * example config.txt file:
+    * an example config.txt file:
 ```
-subdomain:zccwillcsquared
+subdomain:zccwill*******
 email:will********@gmail.com
 token:******************************xduMNi
 ```
