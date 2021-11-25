@@ -10,12 +10,12 @@ import tempfile
 # the unit test framework
 import unittest
 
-from requests.auth import AuthBase, HTTPBasicAuth
+from requests.auth import HTTPBasicAuth
 
 # and the file to test
 import main
 
-# used for testing syste output
+# used for testing system output
 import io
 import sys
 
@@ -120,6 +120,7 @@ class TestConfigReading(unittest.TestCase):
 
 
 class TestGetAllTickets(unittest.TestCase):
+    
     def setUp(self) -> None:
         # set up dummy domain and auth
         main.subdomain = "test_subdomain"
