@@ -81,7 +81,7 @@ def show_page(tickets: list, page: int, page_count: int):
     start = page * page_size
 
     # print header
-    print(f"\n\n\nShowing page {page+1}/{page_count+1}")
+    print(f"\n\n\n\n\nShowing page {page+1}/{page_count+1}")
 
     for i in range(start, len(tickets)):
         if i >= start + page_size:
@@ -101,20 +101,30 @@ def show_ticket(tickets: list, id: int):
     # if a ticket was found, display it and wait for any key to return
     if ticket:
         # assemble relevant fields into a string and display it
-        # description, status, priority, subject, submitter
+        print(f"Showing ticket {id}:")
 
-        # get the submitter's info
-        resp = requests.get
+        # get the submitter's first email/uname
+        submitter = ""
+        user_id = ticket['submitter_id']
+        resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/users/{user_id}/identities", auth=auth)
+        if resp.status_code == 200:
+            content = resp.json()
+            if(content['identities'][0]['value']):
+                submitter = content['identities'][0]['value']
+            else:
+                submitter = "N/A"
+        else:
+            submitter = "N/A"
+
+        text = f"\n\n\n\n\n[{id}] ({ticket['status']}) {ticket['subject']}\nsubmitter: {submitter}\n{ticket['description']}\n"
+        print(text)
 
         # hold user on ticket page until finished
         input("Enter to continue")
         return
 
     # otherwise, ticket id was out of bounds
-    print(f"No ticket with id {id} was found. Please enter a vild id")
-
-        
-
+    print(f"No ticket with id {id} was found. Please enter a valid id")
 
 
 # parse the user input
