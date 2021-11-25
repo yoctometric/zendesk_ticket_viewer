@@ -34,4 +34,4 @@ The program fetches all tickets on the user's account, and then allows the user 
 ## Design Notes
 I chose to download all of the tickets at program start in order to reduce the number of api calls per operation. This way, there is only a quick call to download the user information of the ticket submitter on expanding a ticket, and no calls when changing page. I believe this makes for a smoother and cleaner user experience, although if I were working with a larger data set I would opt to download only one page at a time.
 
-Unit tests were created with the standard python `unittest` library, and do not test api connectivity or functionality because that is out of scope for the program itself
+Unit tests were created with the standard python `unittest` library, and do not test api connectivity or functionality because that is out of scope for the program itself.
