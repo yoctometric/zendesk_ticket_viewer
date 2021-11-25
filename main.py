@@ -8,7 +8,6 @@
 import requests
 from requests.auth import AuthBase, HTTPBasicAuth
 
-
 # global variables
 page_size = 25
 
@@ -21,8 +20,8 @@ subdomain = ""
 class GeneralError(Exception):
     pass
 
-# reads authentication and account data from the config_path string. Default config.txt
-# returns a requests AuthBase object and subdomain string
+
+# reads authentication and account data and returns an AuthBase object and subdomain string
 def read_config(config_path: str="config.txt"):
     subdomain = ""
     email = ""
@@ -98,7 +97,7 @@ def show_page(tickets: list, page: int, page_count: int):
 
 # Gets information on a ticket by id and prints it in a formatted manner. immediate_breakout=True skips the wait for user input
 def show_ticket(tickets: list, id: int, immediate_breakout: bool=False):
-    # get the ticket from the tickets array by id. this is not limited to the current page intentionally
+    # get the ticket from the tickets array by id. Intentionally not limited by current page
     ticket = None
     for t in tickets:
         if int(t['id']) == id:
@@ -165,7 +164,6 @@ def parse_command(command: str, page: int, page_count: int):
     else:
         print("No command recognized. Please enter a valid command")
 
-
     # clamp page 
     if page > page_count:
         page = page_count
@@ -191,7 +189,6 @@ if __name__ == "__main__":
         print(f"Error: could not access the Zendesk Api.")
         exit()
 
-
     # get json data
     try:
         tickets, page_count = get_all_tickets()
@@ -203,11 +200,10 @@ if __name__ == "__main__":
     page = 0
     show_page(tickets, page, page_count)
 
-    # enter main loop
+    # enter main program loop
     while (True):
         command = input("q->quit, n->next page, p->prev page. Enter a ticket id to expand: ")
         page = parse_command(command, page, page_count)
 
-        # show page
         show_page(tickets, page, page_count)
 
