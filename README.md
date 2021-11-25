@@ -1,6 +1,6 @@
 # Zendesk Ticket Viewer
-A ticket viewer created by William Cunningham for the Zendesk internship coding challenge
-
+A command line ticket viewer created by William Cunningham for the Zendesk internship coding challenge
+!["splash image"](splash.png)
 ## Installation
 1. git clone or download the repository
 2. in your terminal, navigate to main.py in the zendesk_ticket_veiwer directory
