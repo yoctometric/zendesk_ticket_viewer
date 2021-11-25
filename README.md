@@ -15,7 +15,7 @@ subdomain:zccwill*******
 email:will********@gmail.com
 token:******************************xduMNi
 ```
-7. run `python main.py`
+6. run `python main.py`
 
 
 ## Unit testing
