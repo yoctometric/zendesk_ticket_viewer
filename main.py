@@ -12,6 +12,10 @@ from requests.auth import AuthBase, HTTPBasicAuth
 # global variables
 page_size = 25
 
+# default auth and subdomain to empty values. set by return of read_config
+auth = AuthBase()
+subdomain = ""
+
 
 # reads authentication and account data from the config_path string. Default config.txt
 # returns a requests AuthBase object and subdomain string
@@ -54,7 +58,7 @@ def read_config(config_path: str="config.txt"):
 
 
 # returns a list of dictionaries of all the account's tickets and the number of pages of tickets
-def get_all_tickets(auth: AuthBase, subdomain: str):
+def get_all_tickets():
     print(f"Getting all tickets from {subdomain}")
 
     # get all of the tickets created since UNIX Epoch time
@@ -86,8 +90,31 @@ def show_page(tickets: list, page: int, page_count: int):
         print(f"[id: {tickets[i]['id']}] | {tickets[i]['subject']}")
 
 
-def show_ticket(tickets: list, id):
-    pass
+def show_ticket(tickets: list, id: int):
+    # get the ticket from the tickets array by id. this is not limited to the current page intentionally
+    ticket = None
+    for t in tickets:
+        if int(t['id']) == id:
+            ticket = t
+            break
+    
+    # if a ticket was found, display it and wait for any key to return
+    if ticket:
+        # assemble relevant fields into a string and display it
+        # description, status, priority, subject, submitter
+
+        # get the submitter's info
+        resp = requests.get
+
+        # hold user on ticket page until finished
+        input("Enter to continue")
+        return
+
+    # otherwise, ticket id was out of bounds
+    print(f"No ticket with id {id} was found. Please enter a vild id")
+
+        
+
 
 
 # parse the user input
@@ -127,9 +154,6 @@ def parse_command(command: str, page: int, page_count: int):
     elif page < 0:
         page = 0
 
-    # show page
-    show_page(tickets, page, page_count)
-
     return page        
 
 
@@ -143,7 +167,7 @@ if __name__ == "__main__":
 
     # get json data
     try:
-        tickets, page_count = get_all_tickets(auth, subdomain)
+        tickets, page_count = get_all_tickets()
     except Exception as e:
         print(e)
         exit()
@@ -156,3 +180,7 @@ if __name__ == "__main__":
     while (True):
         command = input("q->quit, n->next page, p->prev page. Enter a ticket id to expand: ")
         page = parse_command(command, page, page_count)
+
+        # show page
+        show_page(tickets, page, page_count)
+
