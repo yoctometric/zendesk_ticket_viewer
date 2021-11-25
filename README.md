@@ -10,11 +10,11 @@
     * add your subdomain and email
     * either add your password or an api token. If both are added the program will just use the token
     * example config.txt file:
-      `subdomain:zccwillcsquared
-      
-email:will********@gmail.com
-
-token:******************************xduMNi`
+```
+      subdomain:zccwillcsquared
+      email:will********@gmail.com
+      token:******************************xduMNi
+```
 7. run `python main.py`
 
 
