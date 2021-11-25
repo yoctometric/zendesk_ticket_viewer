@@ -62,7 +62,7 @@ def get_all_tickets():
     print(f"Getting all tickets from {subdomain}")
 
     # get all of the tickets created since UNIX Epoch time
-    resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/incremental/tickets/cursor.json?start_time={0}", auth=auth)
+    resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/incremental/tickets/cursor.json?start_time={0}", auth=auth, timeout=5)
     code = resp.status_code
 
     # on a successful call, return the tickets array and page count
@@ -106,7 +106,7 @@ def show_ticket(tickets: list, id: int):
         # get the submitter's first email/uname
         submitter = ""
         user_id = ticket['submitter_id']
-        resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/users/{user_id}/identities", auth=auth)
+        resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/users/{user_id}/identities", auth=auth, timeout=5)
         if resp.status_code == 200:
             content = resp.json()
             if(content['identities'][0]['value']):
@@ -174,6 +174,14 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         exit()
+
+    # ping the server to make sure the api is online
+    try:
+        r = requests.get(f"https://{subdomain}.zendesk.com/api/v2", auth=auth, timeout=1)
+    except Exception as e:
+        print(f"Error: could not access the Zendesk Api.")
+        exit()
+
 
     # get json data
     try:
