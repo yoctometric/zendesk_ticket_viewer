@@ -5,8 +5,10 @@
 # o-------------------------------------------o
 
 # used for handling get requests and auth
+from socket import socket
 import requests
 from requests.auth import AuthBase, HTTPBasicAuth
+from urllib3.exceptions import NewConnectionError
 
 # global variables
 page_size = 25
@@ -110,17 +112,17 @@ def show_ticket(tickets: list, id: int, immediate_breakout: bool=False):
         print(f"Showing ticket {id}:")
 
         # get the submitter's first email/uname
-        submitter = ""
+        submitter = "N/A"
         user_id = ticket['submitter_id']
-        resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/users/{user_id}/identities", auth=auth, timeout=5)
-        if resp.status_code == 200:
-            content = resp.json()
-            if(content['identities'][0]['value']):
-                submitter = content['identities'][0]['value']
-            else:
-                submitter = "N/A"
-        else:
-            submitter = "N/A"
+
+        try:
+            resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/users/{user_id}/identities", auth=auth, timeout=5)
+            if resp.status_code == 200:
+                content = resp.json()
+                if(content['identities'][0]['value']):
+                    submitter = content['identities'][0]['value']
+        except Exception as e:
+            print("Error: could not connect to ZenDesk API. SHowing ticket without submitter email:")
 
         text = f"\n\n\n\n\n[{id}] ({ticket['status']}) {ticket['subject']}\nsubmitter: {submitter}\n{ticket['description']}\n"
         print(text)
