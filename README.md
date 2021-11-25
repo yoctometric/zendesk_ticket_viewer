@@ -23,10 +23,15 @@ token:******************************xduMNi
 2. run `python tests.py`
 
 
-### Usage
+## Usage
 The program fetches all tickets on the user's account, and then allows the user to page through their tickets 25 at a time.
    - enter 'n' or 'next' to navigate to the next page
    - enter 'p' or 'prev' to navigate to the previous page
    - enter 'q' or 'quit' to exit the program
    - enter the id of a ticket to expand it. Any ticket can be viewed at any time regardless of the current page for ease of use.
       
+      
+## Design Notes
+I chose to download all of the tickets at program start in order to reduce the number of api calls per operation. This way, there is only a quick call to download the user information of the ticket submitter on expanding a ticket, and no calls when changing page. I believe this makes for a smoother and cleaner user experience, although if I were working with a larger data set I would opt to download only one page at a time.
+
+Unit tests were created with the standard python `unittest` library, and do not test api connectivity or functionality because that is out of scope for the program itself
