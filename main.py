@@ -1,7 +1,7 @@
 # o-------------------------------------------o
 # |   William Cunningham                      |
 # |   Zendesk Internship challenge            |
-# |   11 / 22 / 2021                          |
+# |   11 / 24 / 2021                          |
 # o-------------------------------------------o
 
 # used for handling get requests and auth
@@ -16,6 +16,10 @@ page_size = 25
 auth = AuthBase()
 subdomain = ""
 
+
+# a custom error type defined for unit test compatibility
+class GeneralError(Exception):
+    pass
 
 # reads authentication and account data from the config_path string. Default config.txt
 # returns a requests AuthBase object and subdomain string
@@ -41,13 +45,13 @@ def read_config(config_path: str="config.txt"):
 
     # error checking
     if subdomain == "":
-        raise Exception(f"Error: No subdomain found in {config_path}. Please specify by adding the line:\nsubdomain:your_subdomain")
+        raise GeneralError(f"Error: No subdomain found in {config_path}. Please specify by adding the line:\nsubdomain:your_subdomain")
 
     if email == "":
-        raise Exception(f"Error: No subdomain found in {config_path}. Please specify by adding the line:\nemail:your_email")
+        raise GeneralError(f"Error: No email found in {config_path}. Please specify by adding the line:\nemail:your_email")
 
     if password == "" and token == "":
-        raise Exception(f"Error: No password or token found in {config_path}. Please specify by adding the line:\npassword:your_password\nor\ntoken:your_api_token")
+        raise GeneralError(f"Error: No password or token found in {config_path}. Please specify by adding the line:\npassword:your_password\nor\ntoken:your_api_token")
 
 
     # make an auth object based on api_key or password. Pereference given to api token
@@ -73,10 +77,10 @@ def get_all_tickets():
         return tickets, page_count
 
     # otherwise, error
-    raise Exception(f"Error: Request recieved error response code {code}")
+    raise GeneralError(f"Error: Request recieved error response code {code}")
     
 
-# renders a page of tickets
+# renders a page of tickets. Returns True if it reached more than 25 tickets
 def show_page(tickets: list, page: int, page_count: int):
     start = page * page_size
 
@@ -85,12 +89,15 @@ def show_page(tickets: list, page: int, page_count: int):
 
     for i in range(start, len(tickets)):
         if i >= start + page_size:
-            return # cancel after page_size tickets have been printed
+            return True # cancel after page_size tickets have been printed
 
         print(f"[id: {tickets[i]['id']}] | {tickets[i]['subject']}")
+    
+    return False
 
 
-def show_ticket(tickets: list, id: int):
+# Gets information on a ticket by id and prints it in a formatted manner. immediate_breakout=True skips the wait for user input
+def show_ticket(tickets: list, id: int, immediate_breakout: bool=False):
     # get the ticket from the tickets array by id. this is not limited to the current page intentionally
     ticket = None
     for t in tickets:
@@ -120,11 +127,13 @@ def show_ticket(tickets: list, id: int):
         print(text)
 
         # hold user on ticket page until finished
-        input("Enter to continue")
-        return
+        if not immediate_breakout:
+            input("Enter to continue")
+        return True
 
     # otherwise, ticket id was out of bounds
     print(f"No ticket with id {id} was found. Please enter a valid id")
+    return False
 
 
 # parse the user input
