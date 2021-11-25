@@ -21,3 +21,12 @@ token:******************************xduMNi
 ## Unit testing
 1. in your terminal, navigate to main.py in the zendesk_ticket_veiwer directory
 2. run `python tests.py`
+
+
+### Usage
+The program fetches all tickets on the user's account, and then allows the user to page through their tickets 25 at a time.
+      * enter 'n' or 'next' to navigate to the next page
+      * enter 'p' or 'prev' to navigate to the previous page
+      * enter 'q' or 'quit' to exit the program
+      * enter the id of a ticket to expand it. Any ticket can be viewed at any time regardless of the current page for ease of use.
+      
