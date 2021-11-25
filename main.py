@@ -6,7 +6,7 @@
 
 # used for handling get requests and auth
 import requests
-from requests.auth import HTTPBasicAuth
+from requests.auth import AuthBase, HTTPBasicAuth
 
 
 # global variables
@@ -15,7 +15,7 @@ page_size = 25
 
 # reads authentication and account data from the config_path string. Default config.txt
 # returns a requests AuthBase object and subdomain string
-def read_config(config_path="config.txt"):
+def read_config(config_path: str="config.txt"):
     subdomain = ""
     email = ""
     password = ""
@@ -54,40 +54,83 @@ def read_config(config_path="config.txt"):
 
 
 # returns a list of dictionaries of all the account's tickets and the number of pages of tickets
-def get_all_tickets(auth, subdomain):
+def get_all_tickets(auth: AuthBase, subdomain: str):
     print(f"Getting all tickets from {subdomain}")
 
-    data = requests.get(f"https://{subdomain}.zendesk.com/api/v2/tickets.json", auth=auth)
+    # get all of the tickets created since UNIX Epoch time
+    resp = requests.get(f"https://{subdomain}.zendesk.com/api/v2/incremental/tickets/cursor.json?start_time={0}", auth=auth)
+    code = resp.status_code
 
-    code = data.status_code
-
-    # on a successful call, return the tickets list and number of pages
+    # on a successful call, return the tickets array and page count
     if code == 200:
-        tickets = data.json()['tickets']
-        return tickets, (len(tickets) - 1) // page_size
-    
+        tickets = resp.json()['tickets']
+        page_count = ((len(tickets) - 1) // page_size)
+
+        return tickets, page_count
+
     # otherwise, error
     raise Exception(f"Error: Request recieved error response code {code}")
     
 
 # renders a page of tickets
-def show_page(tickets, page, page_count):
+def show_page(tickets: list, page: int, page_count: int):
     start = page * page_size
 
     # print header
-    print(f"\n\n\nShowing page {page+1}/{page_size+1}")
+    print(f"\n\n\nShowing page {page+1}/{page_count+1}")
 
     for i in range(start, len(tickets)):
         if i >= start + page_size:
             return # cancel after page_size tickets have been printed
 
-        print(f"[{i+1}] id: {tickets[i]['id']} | {tickets[i]['subject']}")
+        print(f"[id: {tickets[i]['id']}] | {tickets[i]['subject']}")
+
+
+def show_ticket(tickets: list, id):
+    pass
 
 
 # parse the user input
-def parse_command(command):
+def parse_command(command: str, page: int, page_count: int):
+    command = command.lower()
     if command == 'q' or command == 'quit':
         exit()
+
+    # if the command is an int, check for ticket id
+    id = -1
+    try:
+        id = int(command)
+    except ValueError:
+        pass # int() returns a value error if the string was not parsable
+
+    # if the id is valid, attempt to expand it
+    if (id >= 0):
+        show_ticket(tickets, id)
+        return page
+    
+    # otherwise, this is a page operation. 
+    if command == 'n' or command == 'next':
+        page += 1
+    
+    elif command == 'p' or command == 'prev':
+        page -= 1
+    
+    # if no command was recognized, explain so to the user
+    else:
+        print("No command recognized. Please enter a valid command")
+
+
+    # clamp page 
+    if page > page_count:
+        page = page_count
+    
+    elif page < 0:
+        page = 0
+
+    # show page
+    show_page(tickets, page, page_count)
+
+    return page        
 
 
 if __name__ == "__main__":
@@ -105,9 +148,11 @@ if __name__ == "__main__":
         print(e)
         exit()
 
-    show_page(tickets, 0, page_count)
-    # enter main loop
+    # show the first page
+    page = 0
+    show_page(tickets, page, page_count)
 
+    # enter main loop
     while (True):
-        command = input("(q/quit) to exit, (prev/p) for previous page, (next/n) for next page:")
-        parse_command(command)
+        command = input("q->quit, n->next page, p->prev page. Enter a ticket id to expand: ")
+        page = parse_command(command, page, page_count)
