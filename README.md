@@ -1,5 +1,5 @@
 # Zendesk Ticket Viewer
-### A command line ticket viewer created by William Cunningham for the Zendesk internship coding challenge
+### A command line ticket viewer created by Willow Cunningham for the Zendesk internship coding challenge
 !["splash image"](splash.png)
 ## Installation
 1. git clone or download the repository
